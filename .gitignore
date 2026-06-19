@@ -1,0 +1,17 @@
+node_modules
+dist
+.DS_Store
+*.log
+.env
+.venv
+venv
+env
+
+# Backend
+backend/.env
+backend/.venv
+backend/venv
+backend/env
+backend/__pycache__/
+backend/**/*.pyc
+backend/preprocessing_outputs/
