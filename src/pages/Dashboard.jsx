@@ -102,13 +102,24 @@ const Dashboard = () => {
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke={theme.palette.divider} />
                 <XAxis dataKey="month" tick={{ fill: theme.palette.text.secondary }} />
-                <YAxis tick={{ fill: theme.palette.text.secondary }} />
+                <YAxis
+                  tick={{ fill: theme.palette.text.secondary }}
+                  width={75}
+                  tickFormatter={(value) =>
+                    new Intl.NumberFormat("en-US", {
+                      notation: "compact",
+                      compactDisplay: "short",
+                    }).format(value)
+                  }
+                />
                 <Tooltip
                   contentStyle={{
                     backgroundColor: theme.palette.background.paper,
                     border: `1px solid ${theme.palette.divider}`,
                     borderRadius: 14,
+                    color: theme.palette.text.primary,
                   }}
+                  itemStyle={{ color: theme.palette.text.primary }}
                   formatter={(value, name) =>
                     name === "revenue" ? [formatCurrency(value), "Revenue"] : [value, "Orders"]
                   }
@@ -151,7 +162,9 @@ const Dashboard = () => {
                     backgroundColor: theme.palette.background.paper,
                     border: `1px solid ${theme.palette.divider}`,
                     borderRadius: 14,
+                    color: theme.palette.text.primary,
                   }}
+                  itemStyle={{ color: theme.palette.text.primary }}
                 />
                 <Legend verticalAlign="bottom" />
               </PieChart>
@@ -169,13 +182,17 @@ const Dashboard = () => {
               <BarChart data={data.frequencyDistribution}>
                 <CartesianGrid strokeDasharray="3 3" stroke={theme.palette.divider} />
                 <XAxis dataKey="bucket" tick={{ fill: theme.palette.text.secondary }} />
-                <YAxis tick={{ fill: theme.palette.text.secondary }} />
+                <YAxis tick={{ fill: theme.palette.text.secondary }} width={60} />
                 <Tooltip
+                  cursor={{ fill: alpha(theme.palette.text.primary, 0.05) }}
+                  formatter={(value) => [value, "Customers"]}
                   contentStyle={{
                     backgroundColor: theme.palette.background.paper,
                     border: `1px solid ${theme.palette.divider}`,
                     borderRadius: 14,
+                    color: theme.palette.text.primary,
                   }}
+                  itemStyle={{ color: theme.palette.text.primary }}
                 />
                 <Bar dataKey="customers" radius={[10, 10, 0, 0]} fill={theme.palette.secondary.main} />
               </BarChart>

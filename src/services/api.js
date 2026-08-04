@@ -140,3 +140,43 @@ export const getProductAnalysisData = async ({
   });
   return data;
 };
+
+export const getInventoryData = async () => {
+  const { data } = await api.get("/inventory");
+  return data;
+};
+
+export const addInventoryItem = async (item) => {
+  const { data } = await api.post("/inventory", item);
+  return data;
+};
+
+export const updateInventoryItem = async (itemId, item) => {
+  const { data } = await api.put(`/inventory/${itemId}`, item);
+  return data;
+};
+
+export const deleteInventoryItem = async (itemId) => {
+  const { data } = await api.delete(`/inventory/${itemId}`);
+  return data;
+};
+
+export const uploadInventoryDataset = async (file) => {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const { data } = await api.post("/inventory/upload", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+    timeout: 300000,
+  });
+  return data;
+};
+
+export const syncInventoryDatasets = async () => {
+  const { data } = await api.post("/inventory/sync", {}, {
+    timeout: 300000,
+  });
+  return data;
+};

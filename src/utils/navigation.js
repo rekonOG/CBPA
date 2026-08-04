@@ -1,4 +1,4 @@
-﻿import AssessmentRoundedIcon from "@mui/icons-material/AssessmentRounded";
+import AssessmentRoundedIcon from "@mui/icons-material/AssessmentRounded";
 import CloudUploadRoundedIcon from "@mui/icons-material/CloudUploadRounded";
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import InsightsRoundedIcon from "@mui/icons-material/InsightsRounded";
@@ -8,6 +8,7 @@ import BubbleChartRoundedIcon from "@mui/icons-material/BubbleChartRounded";
 import HubRoundedIcon from "@mui/icons-material/HubRounded";
 import CategoryRoundedIcon from "@mui/icons-material/CategoryRounded";
 import QueryStatsRoundedIcon from "@mui/icons-material/QueryStatsRounded";
+import InventoryRoundedIcon from "@mui/icons-material/InventoryRounded";
 
 export const navigationItems = [
   {
@@ -17,16 +18,10 @@ export const navigationItems = [
     description: "KPIs and trends",
   },
   {
-    label: "Upload Data",
+    label: "Data Hub",
     path: "/upload",
     icon: CloudUploadRoundedIcon,
-    description: "Add fresh datasets",
-  },
-  {
-    label: "Product Upload",
-    path: "/upload-product",
-    icon: CategoryRoundedIcon,
-    description: "Store product datasets",
+    description: "Ingest datasets & inventory",
   },
   {
     label: "Product Analysis",
@@ -59,6 +54,12 @@ export const navigationItems = [
     description: "Recommendations",
   },
   {
+    label: "Inventory Management",
+    path: "/inventory",
+    icon: InventoryRoundedIcon,
+    description: "Manage items & stock",
+  },
+  {
     label: "About",
     path: "/about",
     icon: InfoRoundedIcon,
@@ -76,12 +77,8 @@ const routeDetails = {
     subtitle: "Track performance, trends, and customer value in one place.",
   },
   "/upload": {
-    title: "Upload Dataset",
-    subtitle: "Push CSV or Excel files into the analysis workflow.",
-  },
-  "/upload-product": {
-    title: "Product Upload",
-    subtitle: "Store product files in a separate dataset context.",
+    title: "Data Hub",
+    subtitle: "Centralized ingestion for customers, products, and inventory.",
   },
   "/product-analysis": {
     title: "Product Analysis",
@@ -102,6 +99,10 @@ const routeDetails = {
   "/insights": {
     title: "Insights & Recommendations",
     subtitle: "Turn model output into retention and growth actions.",
+  },
+  "/inventory": {
+    title: "Inventory Management",
+    subtitle: "Track, add, edit, and manage store items and serial codes in real-time.",
   },
   "/about": {
     title: "About The Project",

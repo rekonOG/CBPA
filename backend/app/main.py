@@ -7,6 +7,7 @@ from .config import settings
 from .database import initialize_repository
 from .routes.analytics import router as analytics_router
 from .routes.upload import router as upload_router
+from .routes.inventory import router as inventory_router
 from .services.inference import load_inference_artifacts
 
 app = FastAPI(title=settings.app_name)
@@ -46,6 +47,7 @@ def on_shutdown() -> None:
 
 app.include_router(upload_router)
 app.include_router(analytics_router)
+app.include_router(inventory_router)
 
 
 @app.get("/health")

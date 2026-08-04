@@ -66,6 +66,15 @@ _COLUMN_CANDIDATES = {
         "purchase_date",
         "last_txn_date",
     ],
+    "item_id": [
+        "item_id",
+        "product_id",
+        "stockcode",
+        "item",
+        "product",
+        "sku",
+        "description",
+    ],
 }
 
 
@@ -205,11 +214,15 @@ def build_customer_frame(raw_frame: pd.DataFrame) -> tuple[pd.DataFrame, dict[st
     )
     missing_mask = preview_subset.isna() | empty_string_mask
 
+    item_source = _pick_series(frame, "item_id")
+    total_items = int(item_source.nunique()) if item_source is not None else 0
+
     quality = {
         "totalRows": int(len(customers)),
         "totalColumns": len(PREVIEW_COLUMNS),
         "missingCells": int(missing_mask.sum().sum()),
         "rowsWithMissingValues": int(missing_mask.any(axis=1).sum()),
+        "totalItems": total_items,
     }
 
     return customers, quality

@@ -4,6 +4,7 @@ import InsightsRoundedIcon from "@mui/icons-material/InsightsRounded";
 import QueryStatsRoundedIcon from "@mui/icons-material/QueryStatsRounded";
 import RefreshRoundedIcon from "@mui/icons-material/RefreshRounded";
 import {
+  alpha,
   Box,
   Button,
   FormControl,
@@ -403,13 +404,16 @@ const ProductAnalysis = () => {
                     textAnchor="end"
                     height={70}
                   />
-                  <YAxis tick={{ fill: theme.palette.text.secondary }} />
+                  <YAxis tick={{ fill: theme.palette.text.secondary }} width={75} />
                   <Tooltip
+                    cursor={{ fill: alpha(theme.palette.text.primary, 0.05) }}
                     contentStyle={{
                       backgroundColor: theme.palette.background.paper,
                       border: `1px solid ${theme.palette.divider}`,
                       borderRadius: 12,
+                      color: theme.palette.text.primary,
                     }}
+                    itemStyle={{ color: theme.palette.text.primary }}
                     formatter={(value, key) =>
                       key === "total_revenue" ? [formatCurrency(value), "Revenue"] : [value, key]
                     }
@@ -443,21 +447,27 @@ const ProductAnalysis = () => {
                 <ScatterChart>
                   <CartesianGrid strokeDasharray="3 3" stroke={theme.palette.divider} />
                   <XAxis
+                    type="number"
                     dataKey="total_quantity_sold"
                     name="Total Quantity"
                     tick={{ fill: theme.palette.text.secondary }}
                   />
                   <YAxis
+                    type="number"
                     dataKey="total_revenue"
                     name="Total Revenue"
                     tick={{ fill: theme.palette.text.secondary }}
+                    width={75}
                   />
                   <Tooltip
+                    cursor={{ strokeDasharray: '3 3', stroke: alpha(theme.palette.text.primary, 0.2) }}
                     contentStyle={{
                       backgroundColor: theme.palette.background.paper,
                       border: `1px solid ${theme.palette.divider}`,
                       borderRadius: 12,
+                      color: theme.palette.text.primary,
                     }}
+                    itemStyle={{ color: theme.palette.text.primary }}
                     formatter={(value, name) =>
                       name === "Total Revenue" ? [formatCurrency(value), name] : [value, name]
                     }
@@ -491,13 +501,15 @@ const ProductAnalysis = () => {
                 <LineChart data={demandSeries}>
                   <CartesianGrid strokeDasharray="3 3" stroke={theme.palette.divider} />
                   <XAxis dataKey="period" tick={{ fill: theme.palette.text.secondary }} />
-                  <YAxis tick={{ fill: theme.palette.text.secondary }} />
+                  <YAxis tick={{ fill: theme.palette.text.secondary }} width={75} />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: theme.palette.background.paper,
                       border: `1px solid ${theme.palette.divider}`,
                       borderRadius: 12,
+                      color: theme.palette.text.primary,
                     }}
+                    itemStyle={{ color: theme.palette.text.primary }}
                     formatter={(value, key) => {
                       if (key === "total_sales" || key === "moving_average") {
                         return [formatCurrency(value), key === "total_sales" ? "Total Sales" : "Moving Avg"];
@@ -543,13 +555,15 @@ const ProductAnalysis = () => {
                 <LineChart data={forecastSeries}>
                   <CartesianGrid strokeDasharray="3 3" stroke={theme.palette.divider} />
                   <XAxis dataKey="period" tick={{ fill: theme.palette.text.secondary }} />
-                  <YAxis tick={{ fill: theme.palette.text.secondary }} />
+                  <YAxis tick={{ fill: theme.palette.text.secondary }} width={75} />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: theme.palette.background.paper,
                       border: `1px solid ${theme.palette.divider}`,
                       borderRadius: 12,
+                      color: theme.palette.text.primary,
                     }}
+                    itemStyle={{ color: theme.palette.text.primary }}
                     formatter={(value, key) =>
                       key === "actual" || key === "forecast"
                         ? [formatCurrency(value), key === "actual" ? "Actual Sales" : "Forecast Sales"]

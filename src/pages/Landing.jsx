@@ -3,6 +3,7 @@ import AutoGraphRoundedIcon from "@mui/icons-material/AutoGraphRounded";
 import BubbleChartRoundedIcon from "@mui/icons-material/BubbleChartRounded";
 import CloudUploadRoundedIcon from "@mui/icons-material/CloudUploadRounded";
 import InsightsRoundedIcon from "@mui/icons-material/InsightsRounded";
+import InventoryRoundedIcon from "@mui/icons-material/InventoryRounded";
 import {
   alpha,
   AppBar,
@@ -97,7 +98,7 @@ const Landing = () => {
                   Customer Buying Pattern Analysis
                 </Typography>
                 <Typography variant="body2" sx={{ color: "rgba(231,238,248,0.68)" }}>
-                  Major Project Frontend
+                  Analytics Dashboard
                 </Typography>
               </Box>
             </Stack>
@@ -158,8 +159,7 @@ const Landing = () => {
                 }}
               >
                 This frontend presents RFM analysis, K-Means clustering, customer segmentation,
-                and decision-ready insights in a clean dashboard experience built for your major
-                project.
+                and decision-ready insights in a clean dashboard experience.
               </Typography>
 
               <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} sx={{ mt: 3.5 }}>
@@ -171,6 +171,21 @@ const Landing = () => {
                   endIcon={<ArrowOutwardRoundedIcon />}
                 >
                   Explore Analytics
+                </Button>
+                <Button
+                  component={RouterLink}
+                  to="/inventory"
+                  variant="contained"
+                  size="large"
+                  startIcon={<InventoryRoundedIcon />}
+                  sx={{
+                    background: "linear-gradient(135deg, #10B981 0%, #059669 100%)",
+                    "&:hover": {
+                      background: "linear-gradient(135deg, #059669 0%, #047857 100%)",
+                    },
+                  }}
+                >
+                  Manage Inventory
                 </Button>
                 <Button
                   component={RouterLink}
@@ -248,56 +263,56 @@ const Landing = () => {
               />
             </Grid>
           </Grid>
-            <Grid container spacing={3} sx={{ mt: { xs: 4, md: 6 } }}>
-              {highlights.map((item) => {
-                const Icon = item.icon;
+          <Grid container spacing={3} sx={{ mt: { xs: 4, md: 6 } }}>
+            {highlights.map((item) => {
+              const Icon = item.icon;
 
-                return (
-                  <Grid item xs={12} md={4} key={item.title}>
-                    <Paper
-                      className="fade-up"
+              return (
+                <Grid item xs={12} md={4} key={item.title}>
+                  <Paper
+                    className="fade-up"
+                    sx={{
+                      p: 3,
+                      height: "100%",
+                      background: "#000000",
+                      border: "1px solid rgba(148,163,184,0.12)",
+                      cursor: "default",
+                      transition: "transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, border-color 0.25s ease",
+                      "&:hover": {
+                        transform: "translateY(-6px)",
+                        background: "linear-gradient(145deg, rgba(20,184,166,0.12), rgba(37,99,235,0.10))",
+                        borderColor: "rgba(20,184,166,0.45)",
+                        boxShadow: "0 16px 48px rgba(0,0,0,0.55), 0 0 0 1px rgba(20,184,166,0.18), 0 0 24px rgba(20,184,166,0.12)",
+                      },
+                    }}
+                  >
+                    <Box
                       sx={{
-                        p: 3,
-                        height: "100%",
-                        background: "#000000",
-                        border: "1px solid rgba(148,163,184,0.12)",
-                        cursor: "default",
-                        transition: "transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, border-color 0.25s ease",
-                        "&:hover": {
-                          transform: "translateY(-6px)",
-                          background: "linear-gradient(145deg, rgba(20,184,166,0.12), rgba(37,99,235,0.10))",
-                          borderColor: "rgba(20,184,166,0.45)",
-                          boxShadow: "0 16px 48px rgba(0,0,0,0.55), 0 0 0 1px rgba(20,184,166,0.18), 0 0 24px rgba(20,184,166,0.12)",
-                        },
+                        width: 54,
+                        height: 54,
+                        borderRadius: "18px",
+                        display: "grid",
+                        placeItems: "center",
+                        color: "primary.main",
+                        backgroundColor: alpha(theme.palette.primary.main, 0.12),
                       }}
                     >
-                      <Box
-                        sx={{
-                          width: 54,
-                          height: 54,
-                          borderRadius: "18px",
-                          display: "grid",
-                          placeItems: "center",
-                          color: "primary.main",
-                          backgroundColor: alpha(theme.palette.primary.main, 0.12),
-                        }}
-                      >
-                        <Icon />
-                      </Box>
-                      <Typography variant="h6" sx={{ mt: 2, color: "#F8FBFF" }}>
-                        {item.title}
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        sx={{ mt: 1.1, lineHeight: 1.8, color: "rgba(231,238,248,0.65)" }}
-                      >
-                        {item.description}
-                      </Typography>
-                    </Paper>
-                  </Grid>
-                );
-              })}
-            </Grid>
+                      <Icon />
+                    </Box>
+                    <Typography variant="h6" sx={{ mt: 2, color: "#F8FBFF" }}>
+                      {item.title}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{ mt: 1.1, lineHeight: 1.8, color: "rgba(231,238,248,0.65)" }}
+                    >
+                      {item.description}
+                    </Typography>
+                  </Paper>
+                </Grid>
+              );
+            })}
+          </Grid>
         </Container>
       </Box>
 

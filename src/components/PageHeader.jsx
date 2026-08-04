@@ -7,7 +7,6 @@ const PageHeader = ({ eyebrow, title, subtitle, chipLabel, actionLabel, onAction
 
   return (
     <Paper
-      className="fade-up"
       sx={{
         py: { xs: 3, md: 4 },
         px: { xs: 5, md: 7.5 },

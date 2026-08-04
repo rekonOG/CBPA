@@ -20,7 +20,6 @@ const KpiCard = ({ label, value, description, delta, tone = "primary", icon }) =
 
   return (
     <Paper
-      className="fade-up"
       sx={{
         p: 2.4,
         height: "100%",

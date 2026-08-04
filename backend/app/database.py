@@ -29,8 +29,8 @@ class DatasetRepository:
     ) -> dict[str, Any] | None:
         if dataset_id:
             return self._data.get(dataset_id)
-        # If no dataset_id, return the first one matching dataset_type
-        for dataset in self._data.values():
+        # Return the latest one matching dataset_type
+        for dataset in reversed(list(self._data.values())):
             if dataset_type is None or dataset.get("datasetType") == dataset_type:
                 return dataset
         return None

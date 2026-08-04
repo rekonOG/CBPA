@@ -96,6 +96,11 @@ def build_dashboard_payload(
                 "subtitle": "Dataset completeness estimate before model scoring.",
             },
             {
+                "title": "Total Items Present",
+                "value": str(quality.get("totalItems", 0)),
+                "subtitle": "Unique products or items identified in dataset.",
+            },
+            {
                 "title": "Missing Value Rows",
                 "value": quality["rowsWithMissingValues"],
                 "subtitle": "Rows with at least one empty or null field.",

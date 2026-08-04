@@ -28,11 +28,7 @@ const SidebarContent = ({ onNavigate }) => {
         height: "100%",
         display: "flex",
         flexDirection: "column",
-        background:
-          theme.palette.mode === "light"
-            ? "linear-gradient(180deg, rgba(7,17,31,0.96) 0%, rgba(9,25,47,0.98) 100%)"
-            : "linear-gradient(180deg, rgba(2,6,23,0.98) 0%, rgba(9,20,38,0.98) 100%)",
-        color: "#E7EEF8",
+        overflow: "hidden",
       }}
     >
       <Box sx={{ p: 3 }}>
@@ -93,7 +89,27 @@ const SidebarContent = ({ onNavigate }) => {
         </Typography>
       </Box>
 
-      <List sx={{ px: 2, py: 1.5, flexGrow: 1 }}>
+      <List
+        sx={{
+          px: 2,
+          py: 1.5,
+          flexGrow: 1,
+          overflowY: "auto",
+          "&::-webkit-scrollbar": {
+            width: "6px",
+          },
+          "&::-webkit-scrollbar-track": {
+            background: "transparent",
+          },
+          "&::-webkit-scrollbar-thumb": {
+            background: "rgba(255, 255, 255, 0.12)",
+            borderRadius: "999px",
+          },
+          "&::-webkit-scrollbar-thumb:hover": {
+            background: "rgba(255, 255, 255, 0.24)",
+          },
+        }}
+      >
         {navigationItems.map((item) => {
           const Icon = item.icon;
           const active = location.pathname === item.path;
@@ -153,11 +169,11 @@ const SidebarContent = ({ onNavigate }) => {
         })}
       </List>
 
-      <Box sx={{ p: 2.5 }}>
+      <Box sx={{ p: 2.5, mt: "auto" }}>
         <Box
           className="shimmer"
           sx={{
-            borderRadius: 4,
+            borderRadius: "14px",
             p: 2.25,
             background:
               "linear-gradient(145deg, rgba(15,118,110,0.22), rgba(37,99,235,0.18), rgba(249,115,22,0.14))",
@@ -177,38 +193,52 @@ const SidebarContent = ({ onNavigate }) => {
 };
 
 // Responsive sidebar switches between a mobile drawer and desktop rail.
-const Sidebar = ({ drawerWidth, mobileOpen, onDrawerClose }) => (
-  <>
-    <Drawer
-      variant="temporary"
-      open={mobileOpen}
-      onClose={onDrawerClose}
-      ModalProps={{ keepMounted: true }}
-      sx={{
-        display: { xs: "block", sm: "none" },
-        "& .MuiDrawer-paper": {
-          width: drawerWidth,
-        },
-      }}
-    >
-      <SidebarContent onNavigate={onDrawerClose} />
-    </Drawer>
+const Sidebar = ({ drawerWidth, mobileOpen, onDrawerClose }) => {
+  const theme = useTheme();
 
-    <Drawer
-      variant="permanent"
-      open
-      sx={{
-        display: { xs: "none", sm: "block" },
-        width: drawerWidth,
-        flexShrink: 0,
-        "& .MuiDrawer-paper": {
+  return (
+    <>
+      <Drawer
+        variant="temporary"
+        open={mobileOpen}
+        onClose={onDrawerClose}
+        ModalProps={{ keepMounted: true }}
+        sx={{
+          display: { xs: "block", sm: "none" },
+          "& .MuiDrawer-paper": {
+            width: drawerWidth,
+            background:
+              theme.palette.mode === "light"
+                ? "linear-gradient(180deg, rgba(7,17,31,0.96) 0%, rgba(9,25,47,0.98) 100%)"
+                : "linear-gradient(180deg, rgba(2,6,23,0.98) 0%, rgba(9,20,38,0.98) 100%)",
+            color: "#E7EEF8",
+          },
+        }}
+      >
+        <SidebarContent onNavigate={onDrawerClose} />
+      </Drawer>
+
+      <Drawer
+        variant="permanent"
+        open
+        sx={{
+          display: { xs: "none", sm: "block" },
           width: drawerWidth,
-        },
-      }}
-    >
-      <SidebarContent />
-    </Drawer>
-  </>
-);
+          flexShrink: 0,
+          "& .MuiDrawer-paper": {
+            width: drawerWidth,
+            background:
+              theme.palette.mode === "light"
+                ? "linear-gradient(180deg, rgba(7,17,31,0.96) 0%, rgba(9,25,47,0.98) 100%)"
+                : "linear-gradient(180deg, rgba(2,6,23,0.98) 0%, rgba(9,20,38,0.98) 100%)",
+            color: "#E7EEF8",
+          },
+        }}
+      >
+        <SidebarContent />
+      </Drawer>
+    </>
+  );
+};
 
 export default Sidebar;
