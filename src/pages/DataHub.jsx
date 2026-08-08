@@ -1,10 +1,8 @@
 import Inventory2RoundedIcon from "@mui/icons-material/Inventory2Rounded";
 import PeopleRoundedIcon from "@mui/icons-material/PeopleRounded";
-import StorageRoundedIcon from "@mui/icons-material/StorageRounded";
 import { Box, Tab, Tabs } from "@mui/material";
 import { useState } from "react";
 import CustomerUploadTab from "../components/CustomerUploadTab";
-import InventoryUploadTab from "../components/InventoryUploadTab";
 import PageHeader from "../components/PageHeader";
 import ProductUploadTab from "../components/ProductUploadTab";
 
@@ -20,14 +18,14 @@ const DataHub = () => {
       <PageHeader
         eyebrow="Centralized Ingestion"
         title="Data Hub"
-        subtitle="Upload and manage customer transactions, product catalogs, and inventory sheets."
-        chipLabel="3 Data Streams"
+        subtitle="Upload and manage customer transactions and product catalogs."
+        chipLabel="2 Data Streams"
       />
 
       <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
-        <Tabs 
-          value={tabIndex} 
-          onChange={handleTabChange} 
+        <Tabs
+          value={tabIndex}
+          onChange={handleTabChange}
           aria-label="data hub tabs"
           variant="scrollable"
           scrollButtons="auto"
@@ -42,14 +40,12 @@ const DataHub = () => {
         >
           <Tab icon={<PeopleRoundedIcon />} iconPosition="start" label="Customer Analytics" />
           <Tab icon={<Inventory2RoundedIcon />} iconPosition="start" label="Product Analytics" />
-          <Tab icon={<StorageRoundedIcon />} iconPosition="start" label="Inventory Management" />
         </Tabs>
       </Box>
 
       <Box sx={{ mt: 1 }}>
         {tabIndex === 0 && <CustomerUploadTab />}
         {tabIndex === 1 && <ProductUploadTab />}
-        {tabIndex === 2 && <InventoryUploadTab />}
       </Box>
     </Box>
   );

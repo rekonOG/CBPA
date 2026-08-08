@@ -1,4 +1,4 @@
-﻿import StorageRoundedIcon from "@mui/icons-material/StorageRounded";
+import StorageRoundedIcon from "@mui/icons-material/StorageRounded";
 import TableRowsRoundedIcon from "@mui/icons-material/TableRowsRounded";
 import WarningAmberRoundedIcon from "@mui/icons-material/WarningAmberRounded";
 import { alpha, Box, Chip, Grid, Paper, Stack, Typography } from "@mui/material";
@@ -6,9 +6,11 @@ import { useNavigate } from "react-router-dom";
 import DataTable from "../components/DataTable";
 import ErrorState from "../components/ErrorState";
 import LoadingState from "../components/LoadingState";
+import NoDatasetState from "../components/NoDatasetState";
 import PageHeader from "../components/PageHeader";
 import useApiData from "../hooks/useApiData";
 import { getPreviewData } from "../services/api";
+import { getDatasetId } from "../utils/storage";
 import { formatCurrency, getSegmentColor } from "../utils/formatters";
 
 const emptyPreview = {
@@ -26,13 +28,24 @@ const emptyPreview = {
 // Data preview page focuses on data quality and record-level inspection.
 const Preview = () => {
   const navigate = useNavigate();
+  const hasDataset = Boolean(getDatasetId());
   const { data, loading, error, reload } = useApiData(getPreviewData, emptyPreview);
 
-  if (loading) {
+  if (loading && hasDataset) {
     return (
       <LoadingState
         title="Loading preview..."
         description="Preparing table rows and data quality metrics."
+      />
+    );
+  }
+
+  if (!hasDataset) {
+    return (
+      <NoDatasetState 
+        message="Please upload a customer dataset to preview data and validation."
+        buttonText="Upload Dataset"
+        uploadPath="/upload"
       />
     );
   }

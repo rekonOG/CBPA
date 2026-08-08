@@ -1,4 +1,4 @@
-﻿import CampaignRoundedIcon from "@mui/icons-material/CampaignRounded";
+import CampaignRoundedIcon from "@mui/icons-material/CampaignRounded";
 import ExpandMoreRoundedIcon from "@mui/icons-material/ExpandMoreRounded";
 import LightbulbRoundedIcon from "@mui/icons-material/LightbulbRounded";
 import TrackChangesRoundedIcon from "@mui/icons-material/TrackChangesRounded";
@@ -15,9 +15,11 @@ import {
 import { useNavigate } from "react-router-dom";
 import ErrorState from "../components/ErrorState";
 import LoadingState from "../components/LoadingState";
+import NoDatasetState from "../components/NoDatasetState";
 import PageHeader from "../components/PageHeader";
 import useApiData from "../hooks/useApiData";
 import { getInsightsData } from "../services/api";
+import { getDatasetId } from "../utils/storage";
 
 const emptyInsights = {
   highlights: [],
@@ -39,13 +41,24 @@ const emptyInsights = {
 // Insights page translates model output into business actions and talking points.
 const Insights = () => {
   const navigate = useNavigate();
-  const { data, loading, error, reload } = useApiData(getInsightsData, emptyInsights);
+  const hasDataset = Boolean(getDatasetId());
+  const { data, loading, error, reload } = useApiData(getInsightsData, emptyInsights, [], hasDataset);
 
-  if (loading) {
+  if (loading && hasDataset) {
     return (
       <LoadingState
         title="Loading insights..."
         description="Summarizing patterns, recommendations, and next actions."
+      />
+    );
+  }
+
+  if (!hasDataset) {
+    return (
+      <NoDatasetState 
+        message="Please upload a customer dataset to view AI-generated business insights."
+        buttonText="Upload Dataset"
+        uploadPath="/upload"
       />
     );
   }

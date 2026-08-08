@@ -1,4 +1,4 @@
-﻿import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
+import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import HubRoundedIcon from "@mui/icons-material/HubRounded";
 import {
   alpha,
@@ -17,14 +17,16 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { useDeferredValue, useState, useCallback } from "react";
+import { useDeferredValue, useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import DataTable from "../components/DataTable";
 import ErrorState from "../components/ErrorState";
 import LoadingState from "../components/LoadingState";
+import NoDatasetState from "../components/NoDatasetState";
 import PageHeader from "../components/PageHeader";
 import useApiData from "../hooks/useApiData";
 import { getClusteringOutput } from "../services/api";
+import { getDatasetId } from "../utils/storage";
 import { formatCurrency, getInitials, getSegmentColor } from "../utils/formatters";
 
 const emptySegments = {
@@ -40,12 +42,14 @@ const emptySegments = {
 const Segments = () => {
   const navigate = useNavigate();
   const theme = useTheme();
+  const hasDataset = Boolean(getDatasetId());
   const [clusterBy, setClusterBy] = useState("default");
   const [clusterCount, setClusterCount] = useState(4);
   const { data, loading, error, reload } = useApiData(
     useCallback(() => getClusteringOutput({ clusterBy, clusterCount }), [clusterBy, clusterCount]),
     emptySegments,
-    [clusterBy, clusterCount]
+    [clusterBy, clusterCount],
+    hasDataset
   );
   const [selectedSegment, setSelectedSegment] = useState("All");
   const [searchValue, setSearchValue] = useState("");
@@ -56,6 +60,16 @@ const Segments = () => {
   const hasCustomerData = customers.length > 0;
   const showInitialLoading = loading && !hasCustomerData;
   const showBlockingError = Boolean(error) && !hasCustomerData;
+
+  if (!hasDataset) {
+    return (
+      <NoDatasetState 
+        message="Please upload a customer dataset to explore segmentation profiles."
+        buttonText="Upload Dataset"
+        uploadPath="/upload"
+      />
+    );
+  }
 
   if (showInitialLoading) {
     return (

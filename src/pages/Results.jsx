@@ -34,14 +34,17 @@ import {
   YAxis,
   ZAxis,
 } from "recharts";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ChartCard from "../components/ChartCard";
 import ErrorState from "../components/ErrorState";
 import LoadingState from "../components/LoadingState";
+import NoDatasetState from "../components/NoDatasetState";
 import PageHeader from "../components/PageHeader";
+import PcaScatter3D from "../components/PcaScatter3D";
 import useApiData from "../hooks/useApiData";
-import { getAnalysisResults } from "../services/api";
+import { getClusteringOutput } from "../services/api";
+import { getDatasetId } from "../utils/storage";
 import { formatCurrency } from "../utils/formatters";
 
 const emptyResults = {
@@ -63,15 +66,16 @@ const emptyResults = {
 const Results = () => {
   const navigate = useNavigate();
   const theme = useTheme();
+  const hasDataset = Boolean(getDatasetId());
   const [clusterBy, setClusterBy] = useState("default");
   const [clusterCount, setClusterCount] = useState(4);
 
   const fetchAnalysisResults = useCallback(
-    () => getAnalysisResults({ clusterBy, clusterCount }),
+    () => getClusteringOutput({ clusterBy, clusterCount }),
     [clusterBy, clusterCount]
   );
 
-  const { data, loading, error, reload } = useApiData(fetchAnalysisResults, emptyResults, [fetchAnalysisResults]);
+  const { data, loading, error, reload } = useApiData(fetchAnalysisResults, emptyResults, [fetchAnalysisResults], hasDataset);
 
   const clusterDistribution = Array.isArray(data?.clusterDistribution) ? data.clusterDistribution : [];
   const scatterData = Array.isArray(data?.scatterData) ? data.scatterData : [];

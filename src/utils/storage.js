@@ -6,7 +6,7 @@ const getStoredContext = (key = STORAGE_KEY) => {
     return null;
   }
 
-  const rawValue = window.localStorage.getItem(key);
+  const rawValue = window.sessionStorage.getItem(key);
 
   if (!rawValue) {
     return null;
@@ -24,7 +24,7 @@ const persistContext = (nextContext, key = STORAGE_KEY) => {
     return null;
   }
 
-  window.localStorage.setItem(key, JSON.stringify(nextContext));
+  window.sessionStorage.setItem(key, JSON.stringify(nextContext));
   return nextContext;
 };
 
@@ -80,7 +80,7 @@ export const clearUploadContext = () => {
     return;
   }
 
-  window.localStorage.removeItem(STORAGE_KEY);
+  window.sessionStorage.removeItem(STORAGE_KEY);
 };
 
 export const getProductUploadContext = () => getStoredContext(PRODUCT_STORAGE_KEY);
@@ -135,5 +135,5 @@ export const clearProductUploadContext = () => {
     return;
   }
 
-  window.localStorage.removeItem(PRODUCT_STORAGE_KEY);
+  window.sessionStorage.removeItem(PRODUCT_STORAGE_KEY);
 };

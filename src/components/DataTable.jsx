@@ -110,7 +110,9 @@ const DataTable = ({
                 <TableRow hover key={row.id || JSON.stringify(row)}>
                   {columns.map((column) => {
                     const value = row[column.id];
-                    const missing = highlightMissingValues && isMissingValue(value);
+                    // Only flag missing if the column doesn't have a custom renderer —
+                    // action/computed columns have no raw value on the row and use render() instead.
+                    const missing = highlightMissingValues && !column.render && isMissingValue(value);
 
                     return (
                       <TableCell

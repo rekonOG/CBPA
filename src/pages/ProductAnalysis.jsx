@@ -38,8 +38,10 @@ import ChartCard from "../components/ChartCard";
 import DataTable from "../components/DataTable";
 import ErrorState from "../components/ErrorState";
 import LoadingState from "../components/LoadingState";
+import NoDatasetState from "../components/NoDatasetState";
 import PageHeader from "../components/PageHeader";
 import { getProductAnalysisData } from "../services/api";
+import { getProductDatasetId } from "../utils/storage";
 import { formatCurrency, formatNumber, formatPercent } from "../utils/formatters";
 
 const emptyProductAnalysis = {
@@ -136,7 +138,11 @@ const ProductAnalysis = () => {
   const [clusterBy, setClusterBy] = useState("default");
   const [clusterCount, setClusterCount] = useState(4);
 
+  const hasDataset = Boolean(getProductDatasetId());
+
   const runAnalysis = async (forceRefresh = false) => {
+    if (!hasDataset) return;
+    
     setLoading(true);
     setError("");
 
@@ -162,8 +168,10 @@ const ProductAnalysis = () => {
   };
 
   useEffect(() => {
-    runAnalysis(false);
-  }, []);
+    if (hasDataset) {
+      runAnalysis(false);
+    }
+  }, [hasDataset]);
 
   const warnings = useMemo(() => {
     const allWarnings = [
@@ -215,11 +223,21 @@ const ProductAnalysis = () => {
     [clusteredProducts]
   );
 
-  if (loading) {
+  if (loading && hasDataset) {
     return (
       <LoadingState
         title="Loading product analytics..."
         description="Computing product performance, movement clusters, and sales forecasts."
+      />
+    );
+  }
+
+  if (!hasDataset) {
+    return (
+      <NoDatasetState 
+        message="Please upload a product dataset to view product intelligence and demand forecasts."
+        buttonText="Upload Product Data"
+        uploadPath="/upload"
       />
     );
   }

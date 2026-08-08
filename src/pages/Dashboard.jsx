@@ -19,10 +19,12 @@ import {
   YAxis,
 } from "recharts";
 import { useNavigate } from "react-router-dom";
+import { getDatasetId } from "../utils/storage";
 import ChartCard from "../components/ChartCard";
 import ErrorState from "../components/ErrorState";
 import KpiCard from "../components/KpiCard";
 import LoadingState from "../components/LoadingState";
+import NoDatasetState from "../components/NoDatasetState";
 import PageHeader from "../components/PageHeader";
 import useApiData from "../hooks/useApiData";
 import { getDashboardData } from "../services/api";
@@ -51,13 +53,24 @@ const kpiIcons = [
 const Dashboard = () => {
   const navigate = useNavigate();
   const theme = useTheme();
+  const hasDataset = Boolean(getDatasetId());
   const { data, loading, error, reload } = useApiData(getDashboardData, emptyDashboard);
 
-  if (loading) {
+  if (loading && hasDataset) {
     return (
       <LoadingState
         title="Loading dashboard..."
         description="Aggregating KPIs, trends, and customer distribution."
+      />
+    );
+  }
+
+  if (!hasDataset) {
+    return (
+      <NoDatasetState 
+        message="Please upload a customer dataset to view your dashboard insights and analytics."
+        buttonText="Upload Dataset"
+        uploadPath="/upload"
       />
     );
   }

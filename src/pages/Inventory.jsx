@@ -1,14 +1,16 @@
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
+import RemoveRoundedIcon from "@mui/icons-material/Remove";
 import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
 import EditRoundedIcon from "@mui/icons-material/EditRounded";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
-import CloudUploadRoundedIcon from "@mui/icons-material/CloudUploadRounded";
 import InventoryRoundedIcon from "@mui/icons-material/InventoryRounded";
 import ShoppingBagRoundedIcon from "@mui/icons-material/ShoppingBagRounded";
 import AttachMoneyRoundedIcon from "@mui/icons-material/AttachMoneyRounded";
 import WarningRoundedIcon from "@mui/icons-material/WarningRounded";
 import CategoryRoundedIcon from "@mui/icons-material/CategoryRounded";
 import SyncRoundedIcon from "@mui/icons-material/SyncRounded";
+import AddCircleOutlineRoundedIcon from "@mui/icons-material/AddCircleOutlineRounded";
+import RemoveCircleOutlineRoundedIcon from "@mui/icons-material/RemoveCircleOutlineRounded";
 import {
   alpha,
   Box,
@@ -37,13 +39,13 @@ import { useDeferredValue, useState, useEffect, useCallback } from "react";
 import DataTable from "../components/DataTable";
 import ErrorState from "../components/ErrorState";
 import LoadingState from "../components/LoadingState";
+import NoDatasetState from "../components/NoDatasetState";
 import PageHeader from "../components/PageHeader";
 import {
   getInventoryData,
   addInventoryItem,
   updateInventoryItem,
   deleteInventoryItem,
-  uploadInventoryDataset,
   syncInventoryDatasets,
 } from "../services/api";
 import { formatCurrency } from "../utils/formatters";
@@ -77,15 +79,14 @@ const Inventory = () => {
   const [formValues, setFormValues] = useState(emptyForm);
   const [dialogError, setDialogError] = useState("");
 
-  // Upload state
-  const [uploading, setUploading] = useState(false);
-  const [uploadError, setUploadError] = useState("");
 
   // Toast notification state
   const [toastOpen, setToastOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [toastSeverity, setToastSeverity] = useState("success"); // "success" | "error" | "warning"
   const [isSyncing, setIsSyncing] = useState(false);
+  // Track which item IDs are currently being qty-adjusted (to disable buttons while saving)
+  const [adjustingIds, setAdjustingIds] = useState(new Set());
 
   // Fetch data
   const loadData = useCallback(async () => {
@@ -110,6 +111,40 @@ const Inventory = () => {
     setToastMessage(message);
     setToastSeverity(severity);
     setToastOpen(true);
+  };
+
+  // Quick +/- quantity adjustment
+  const handleAdjustQuantity = async (item, delta) => {
+    const newQty = Math.max(0, (item.quantity || 0) + delta);
+    setAdjustingIds((prev) => new Set(prev).add(item.id));
+    try {
+      await updateInventoryItem(item.id, { quantity: newQty });
+      // Optimistically update local state for instant feedback
+      setItems((prev) =>
+        prev.map((i) =>
+          i.id === item.id
+            ? {
+                ...i,
+                quantity: newQty,
+                status:
+                  newQty <= 0
+                    ? "Out of Stock"
+                    : newQty <= 10
+                    ? "Low Stock"
+                    : "In Stock",
+              }
+            : i
+        )
+      );
+    } catch (err) {
+      showToast(err?.response?.data?.detail || "Failed to update quantity.", "error");
+    } finally {
+      setAdjustingIds((prev) => {
+        const next = new Set(prev);
+        next.delete(item.id);
+        return next;
+      });
+    }
   };
 
   // Delete Action
@@ -189,34 +224,6 @@ const Inventory = () => {
     }
   };
 
-  // Handle Inventory sheet upload
-  const handleFileUpload = async (event) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    const isValidType = /\.(csv|xls|xlsx)$/i.test(file.name);
-    if (!isValidType) {
-      showToast("Please upload a valid CSV or Excel sheet (.csv, .xls, .xlsx).", "error");
-      return;
-    }
-
-    setUploading(true);
-    setUploadError("");
-    try {
-      const res = await uploadInventoryDataset(file);
-      showToast(res.message || "Inventory updated successfully.");
-      loadData();
-    } catch (err) {
-      const errMsg = err?.response?.data?.detail || err?.message || "File import failed.";
-      setUploadError(errMsg);
-      showToast(errMsg, "error");
-    } finally {
-      setUploading(false);
-      // Clear input value so same file can be uploaded again
-      event.target.value = "";
-    }
-  };
-
   const handleSyncDatasets = async () => {
     setIsSyncing(true);
     try {
@@ -257,11 +264,29 @@ const Inventory = () => {
     {
       id: "quantity",
       label: "Stock Qty",
-      minWidth: 100,
-      render: (value) => (
-        <Typography variant="body2" sx={{ fontWeight: 700 }}>
-          {value}
-        </Typography>
+      minWidth: 140,
+      render: (value, row) => (
+        <Stack direction="row" alignItems="center" spacing={0.5}>
+          <IconButton
+            size="small"
+            disabled={adjustingIds.has(row.id) || value <= 0}
+            onClick={() => handleAdjustQuantity(row, -1)}
+            sx={{ color: "error.main", p: 0.3 }}
+          >
+            <RemoveCircleOutlineRoundedIcon fontSize="small" />
+          </IconButton>
+          <Typography variant="body2" sx={{ fontWeight: 700, minWidth: 28, textAlign: "center" }}>
+            {value}
+          </Typography>
+          <IconButton
+            size="small"
+            disabled={adjustingIds.has(row.id)}
+            onClick={() => handleAdjustQuantity(row, +1)}
+            sx={{ color: "success.main", p: 0.3 }}
+          >
+            <AddCircleOutlineRoundedIcon fontSize="small" />
+          </IconButton>
+        </Stack>
       ),
     },
     {
@@ -320,6 +345,15 @@ const Inventory = () => {
 
   if (error && items.length === 0) {
     return <ErrorState message={error} onRetry={loadData} />;
+  }
+
+  if (!loading && items.length === 0 && search === "" && categoryFilter === "All" && statusFilter === "All") {
+    return (
+      <NoDatasetState
+        message="Your inventory catalog is currently empty. Click '+ Add Item' to register your first item."
+        buttonText="Add First Item"
+      />
+    );
   }
 
   return (

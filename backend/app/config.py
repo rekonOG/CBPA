@@ -8,9 +8,7 @@ from pathlib import Path
 @dataclass(frozen=True)
 class Settings:
     app_name: str
-    mongodb_uri: str
-    mongodb_db_name: str
-    mongodb_collection: str
+    sqlite_db_path: Path
     cors_origins: list[str]
     models_dir: Path
     model_version: str
@@ -34,9 +32,9 @@ def _parse_cors_origins(raw_value: str) -> list[str]:
 
 settings = Settings(
     app_name=os.getenv("APP_NAME", "Customer Buying Pattern Analysis API"),
-    mongodb_uri=os.getenv("MONGODB_URI", "mongodb://localhost:27017"),
-    mongodb_db_name=os.getenv("MONGODB_DB_NAME", "cbpa"),
-    mongodb_collection=os.getenv("MONGODB_COLLECTION", "datasets"),
+    sqlite_db_path=Path(
+        os.getenv("SQLITE_DB_PATH", str(PREPROCESSING_OUTPUT_DIR / "cbpa.db"))
+    ),
     cors_origins=_parse_cors_origins(
         os.getenv(
             "CORS_ORIGINS",

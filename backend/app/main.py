@@ -25,12 +25,10 @@ app.add_middleware(
 def on_startup() -> None:
     settings.preprocessing_output_dir.mkdir(parents=True, exist_ok=True)
     try:
-        mongo_client, repository = initialize_repository(settings)
-        app.state.mongo_client = mongo_client
+        repository = initialize_repository(settings)
         app.state.dataset_repository = repository
     except Exception as e:
-        print(f"MongoDB not available: {e}. Running without database.")
-        app.state.mongo_client = None
+        print(f"Failed to initialize SQLite database: {e}")
         app.state.dataset_repository = None
     app.state.inference_artifacts = load_inference_artifacts(
         settings.models_dir,
@@ -40,9 +38,7 @@ def on_startup() -> None:
 
 @app.on_event("shutdown")
 def on_shutdown() -> None:
-    mongo_client = getattr(app.state, "mongo_client", None)
-    if mongo_client is not None:
-        mongo_client.close()
+    pass  # SQLite connections are closed after each query; nothing to clean up here.
 
 
 app.include_router(upload_router)
