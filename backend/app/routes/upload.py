@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from uuid import uuid4
 
-from fastapi import APIRouter, File, Form, HTTPException, Request, UploadFile
+from fastapi import APIRouter, File, Form, HTTPException, Request, UploadFile, Depends
 
 from ..config import settings
 from ..services.data_preprocessing import InputPreprocessor
@@ -23,6 +23,7 @@ from ..services.preprocess import (
     to_serializable_records,
 )
 from ..services.universal_preprocessing import UniversalPreprocessor
+from ..auth import get_current_user, ClerkUser
 
 router = APIRouter(tags=["upload"])
 
@@ -41,7 +42,11 @@ def _parse_scaling_method(raw_value: str) -> ScalingMethod:
 
 
 @router.post("/upload")
-async def upload_dataset(request: Request, file: UploadFile = File(...)) -> dict:
+async def upload_dataset(
+    request: Request,
+    file: UploadFile = File(...),
+    current_user: ClerkUser = Depends(get_current_user)
+) -> dict:
     print("[UPLOAD] upload_dataset started")
     file_name = file.filename or ""
     extension = Path(file_name).suffix.lower()
@@ -148,6 +153,7 @@ async def upload_product_dataset(
     file: UploadFile = File(...),
     scaling_method: str = Form("standard"),
     use_binary_label_encoding: bool = Form(True),
+    current_user: ClerkUser = Depends(get_current_user)
 ) -> dict:
     file_name = file.filename or ""
     extension = Path(file_name).suffix.lower()

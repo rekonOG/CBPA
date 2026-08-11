@@ -6,10 +6,11 @@ from pathlib import Path
 from typing import Any
 
 import pandas as pd
-from fastapi import APIRouter, File, HTTPException, Request, UploadFile
+from fastapi import APIRouter, File, HTTPException, Request, UploadFile, Depends
 from pydantic import BaseModel, Field
 
 from ..database import SQLiteRepository, _item_status
+from ..auth import get_current_user, ClerkUser
 
 router = APIRouter(prefix="/inventory", tags=["inventory"])
 
@@ -46,13 +47,13 @@ def _get_repo(request: Request) -> SQLiteRepository:
 
 
 @router.get("")
-def get_inventory(request: Request) -> dict[str, Any]:
+def get_inventory(request: Request, current_user: ClerkUser = Depends(get_current_user)) -> dict[str, Any]:
     repo = _get_repo(request)
     return {"items": repo.get_inventory_items()}
 
 
 @router.post("")
-def add_item(request: Request, item: ItemCreate) -> dict[str, Any]:
+def add_item(request: Request, item: ItemCreate, current_user: ClerkUser = Depends(get_current_user)) -> dict[str, Any]:
     repo = _get_repo(request)
     new_item = item.dict()
     new_item["status"] = get_item_status(new_item["quantity"])
@@ -63,7 +64,7 @@ def add_item(request: Request, item: ItemCreate) -> dict[str, Any]:
 
 
 @router.put("/{item_id}")
-def update_item(request: Request, item_id: str, payload: ItemUpdate) -> dict[str, Any]:
+def update_item(request: Request, item_id: str, payload: ItemUpdate, current_user: ClerkUser = Depends(get_current_user)) -> dict[str, Any]:
     repo = _get_repo(request)
     updates = payload.dict(exclude_unset=True)
     # Recalculate status if quantity is changing
@@ -79,7 +80,7 @@ def update_item(request: Request, item_id: str, payload: ItemUpdate) -> dict[str
 
 
 @router.delete("/{item_id}")
-def delete_item(request: Request, item_id: str) -> dict[str, Any]:
+def delete_item(request: Request, item_id: str, current_user: ClerkUser = Depends(get_current_user)) -> dict[str, Any]:
     repo = _get_repo(request)
     deleted = repo.delete_inventory_item(item_id)
     if not deleted:
@@ -91,7 +92,7 @@ def delete_item(request: Request, item_id: str) -> dict[str, Any]:
 
 
 @router.post("/upload")
-async def upload_inventory(request: Request, file: UploadFile = File(...)) -> dict[str, Any]:
+async def upload_inventory(request: Request, file: UploadFile = File(...), current_user: ClerkUser = Depends(get_current_user)) -> dict[str, Any]:
     repo = _get_repo(request)
 
     file_name = file.filename or ""
@@ -172,7 +173,7 @@ async def upload_inventory(request: Request, file: UploadFile = File(...)) -> di
 
 
 @router.post("/sync")
-def sync_inventory_datasets(request: Request) -> dict[str, Any]:
+def sync_inventory_datasets(request: Request, current_user: ClerkUser = Depends(get_current_user)) -> dict[str, Any]:
     repo = _get_repo(request)
 
     # Get the latest product dataset

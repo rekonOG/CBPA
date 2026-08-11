@@ -133,12 +133,12 @@ npm run dev
 
 ## Environment Variables
 
-| Variable | Default | Description |
-|---|---|---|
-| `SQLITE_DB_PATH` | `preprocessing_outputs/cbpa.db` | Path to the SQLite database file |
-| `CORS_ORIGINS` | `http://localhost:3000,...` | Allowed frontend origins |
-| `MODEL_VERSION` | `v1` | ML model version folder to load |
-| `PREPROCESSING_OUTPUT_DIR` | `preprocessing_outputs/` | Directory for preprocessed CSVs |
+| Variable                   | Default                         | Description                      |
+| -------------------------- | ------------------------------- | -------------------------------- |
+| `SQLITE_DB_PATH`           | `preprocessing_outputs/cbpa.db` | Path to the SQLite database file |
+| `CORS_ORIGINS`             | `http://localhost:3000,...`     | Allowed frontend origins         |
+| `MODEL_VERSION`            | `v1`                            | ML model version folder to load  |
+| `PREPROCESSING_OUTPUT_DIR` | `preprocessing_outputs/`        | Directory for preprocessed CSVs  |
 
 ---
 

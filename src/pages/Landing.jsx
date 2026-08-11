@@ -19,6 +19,7 @@ import {
   useTheme,
 } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
+import { SignInButton, useAuth } from "@clerk/clerk-react";
 import heroGraphic from "../assets/analytics-hero.svg";
 import { landingQuickLinks } from "../utils/navigation";
 
@@ -58,6 +59,7 @@ const landingStats = [
 // Public-facing landing page introduces the project before the analytics shell takes over.
 const Landing = () => {
   const theme = useTheme();
+  const { isSignedIn } = useAuth();
 
   return (
     <Box
@@ -111,9 +113,15 @@ const Landing = () => {
               >
                 About
               </Button>
-              <Button component={RouterLink} to="/dashboard" variant="contained">
-                Open Dashboard
-              </Button>
+              {isSignedIn ? (
+                <Button component={RouterLink} to="/dashboard" variant="contained">
+                  Open Dashboard
+                </Button>
+              ) : (
+                <SignInButton mode="modal">
+                  <Button variant="contained">Sign In</Button>
+                </SignInButton>
+              )}
             </Stack>
           </Toolbar>
         </AppBar>
@@ -163,15 +171,27 @@ const Landing = () => {
               </Typography>
 
               <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} sx={{ mt: 3.5 }}>
-                <Button
-                  component={RouterLink}
-                  to="/dashboard"
-                  variant="contained"
-                  size="large"
-                  endIcon={<ArrowOutwardRoundedIcon />}
-                >
-                  Explore Analytics
-                </Button>
+                {isSignedIn ? (
+                  <Button
+                    component={RouterLink}
+                    to="/dashboard"
+                    variant="contained"
+                    size="large"
+                    endIcon={<ArrowOutwardRoundedIcon />}
+                  >
+                    Explore Analytics
+                  </Button>
+                ) : (
+                  <SignInButton mode="modal">
+                    <Button
+                      variant="contained"
+                      size="large"
+                      endIcon={<ArrowOutwardRoundedIcon />}
+                    >
+                      Explore Analytics
+                    </Button>
+                  </SignInButton>
+                )}
                 <Button
                   component={RouterLink}
                   to="/inventory"

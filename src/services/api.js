@@ -13,6 +13,16 @@ const api = axios.create({
   timeout: 15000,
 });
 
+export const setupApiInterceptors = (getToken) => {
+  api.interceptors.request.use(async (config) => {
+    const token = await getToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  });
+};
+
 const getRequestConfigWithDataset = (params = {}) => {
   const datasetId = getDatasetId();
 

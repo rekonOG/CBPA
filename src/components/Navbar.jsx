@@ -17,6 +17,7 @@ import {
   useTheme,
 } from "@mui/material";
 import { Link as RouterLink, useLocation } from "react-router-dom";
+import { UserButton } from "@clerk/clerk-react";
 import { getDateLabel } from "../utils/formatters";
 import { getRouteDetails } from "../utils/navigation";
 
@@ -103,6 +104,7 @@ const Navbar = ({ drawerWidth, mode, onMenuClick, onToggleTheme }) => {
               {mode === "light" ? <DarkModeRoundedIcon /> : <LightModeRoundedIcon />}
             </IconButton>
           </Tooltip>
+          <UserButton afterSignOutUrl="/" />
         </Stack>
       </Toolbar>
     </AppBar>

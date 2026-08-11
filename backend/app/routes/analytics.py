@@ -5,7 +5,8 @@ from pathlib import Path
 from typing import Any
 
 import pandas as pd
-from fastapi import APIRouter, HTTPException, Query, Request
+from fastapi import APIRouter, HTTPException, Query, Request, Depends
+from ..auth import get_current_user, ClerkUser
 
 from ..services.inference import rerun_customer_clustering
 from ..services.product_analysis import run_product_analytics
@@ -91,6 +92,7 @@ def _load_product_analysis_frame(dataset: dict[str, Any]) -> pd.DataFrame:
 def get_preview_data(
     request: Request,
     dataset_id: str | None = Query(default=None, alias="datasetId"),
+    current_user: ClerkUser = Depends(get_current_user),
 ) -> dict[str, Any]:
     try:
         dataset = _load_customer_dataset(request, dataset_id)
@@ -105,6 +107,7 @@ def get_preview_data(
 def get_dashboard_data(
     request: Request,
     dataset_id: str | None = Query(default=None, alias="datasetId"),
+    current_user: ClerkUser = Depends(get_current_user),
 ) -> dict[str, Any]:
     try:
         dataset = _load_customer_dataset(request, dataset_id)
@@ -126,6 +129,7 @@ def get_analysis_results(
     dataset_id: str | None = Query(default=None, alias="datasetId"),
     cluster_by: str = Query(default="default", alias="clusterBy"),
     cluster_count: int = Query(default=0, alias="clusterCount", ge=0, le=12),
+    current_user: ClerkUser = Depends(get_current_user),
 ) -> dict[str, Any]:
     try:
         dataset = _load_customer_dataset(request, dataset_id)
@@ -156,6 +160,7 @@ def get_results_data(
     dataset_id: str | None = Query(default=None, alias="datasetId"),
     cluster_by: str = Query(default="default", alias="clusterBy"),
     cluster_count: int = Query(default=0, alias="clusterCount", ge=0, le=12),
+    current_user: ClerkUser = Depends(get_current_user),
 ) -> dict[str, Any]:
     try:
         dataset = _load_customer_dataset(request, dataset_id)
@@ -196,6 +201,7 @@ def get_results_data(
 def get_insights_data(
     request: Request,
     dataset_id: str | None = Query(default=None, alias="datasetId"),
+    current_user: ClerkUser = Depends(get_current_user),
 ) -> dict[str, Any]:
     try:
         dataset = _load_customer_dataset(request, dataset_id)
@@ -215,6 +221,7 @@ def get_product_analysis_data(
     force_refresh: bool = Query(default=False, alias="forceRefresh"),
     cluster_by: str = Query(default="default", alias="clusterBy"),
     cluster_count: int = Query(default=6, alias="clusterCount", ge=2, le=12),
+    current_user: ClerkUser = Depends(get_current_user),
 ) -> dict[str, Any]:
     frequency_key = frequency.strip().lower()
     if frequency_key not in {"auto", "daily", "monthly"}:
