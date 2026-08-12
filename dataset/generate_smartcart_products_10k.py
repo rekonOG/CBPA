@@ -18,7 +18,12 @@ def generate_products_dataset(filename="gen_smartcart_products_10k.csv", num_row
         for _ in range(num_rows):
             prod = random.choice(products)
             random_date = start_date + datetime.timedelta(days=random.randrange(days_between_dates))
-            qty = random.randint(1, 15)
+            
+            # Introduce a positive trend over time so the forecast goes up!
+            days_from_start = (random_date - start_date).days
+            trend_multiplier = 1.0 + (days_from_start / days_between_dates) * 3.0
+            
+            qty = int(random.randint(1, 15) * trend_multiplier)
             revenue = round(qty * prod["price"], 2)
             
             writer.writerow([

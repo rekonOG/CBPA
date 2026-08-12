@@ -56,7 +56,6 @@ const Segments = () => {
   const deferredSearch = useDeferredValue(searchValue);
 
   const customers = Array.isArray(data?.customers) ? data.customers : [];
-  const segments = Array.isArray(data?.segments) ? data.segments : [];
   const hasCustomerData = customers.length > 0;
   const showInitialLoading = loading && !hasCustomerData;
   const showBlockingError = Boolean(error) && !hasCustomerData;
@@ -105,14 +104,6 @@ const Segments = () => {
     );
   }
 
-  const filteredRows = customers.filter((customer) => {
-    const matchesSegment = selectedSegment === "All" || customer.segment === selectedSegment;
-    const haystack = `${customer.id} ${customer.customerName} ${customer.city}`.toLowerCase();
-    const matchesSearch = haystack.includes(deferredSearch.trim().toLowerCase());
-
-    return matchesSegment && matchesSearch;
-  });
-
   const clusterStats = Object.values(
     customers.reduce((acc, customer) => {
       const clusterKey = customer.cluster || "Unassigned";
@@ -137,6 +128,19 @@ const Segments = () => {
   )
     .sort((left, right) => right.customers - left.customers)
     .slice(0, 8);
+
+  const segments = clusterStats.map(stat => ({
+    segment: stat.cluster,
+    value: stat.customers
+  }));
+
+  const filteredRows = customers.filter((customer) => {
+    const matchesSegment = selectedSegment === "All" || customer.segment === selectedSegment;
+    const haystack = `${customer.id} ${customer.customerName} ${customer.city}`.toLowerCase();
+    const matchesSearch = haystack.includes(deferredSearch.trim().toLowerCase());
+
+    return matchesSegment && matchesSearch;
+  });
 
   const maxClusterCount = Math.max(...clusterStats.map((item) => item.customers), 1);
 

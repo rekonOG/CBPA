@@ -107,8 +107,9 @@ const Landing = () => {
 
             <Stack direction="row" spacing={1.25}>
               <Button
-                component={RouterLink}
-                to="/about"
+                onClick={() => {
+                  document.getElementById("features-section")?.scrollIntoView({ behavior: "smooth" });
+                }}
                 sx={{ color: "#E7EEF8", display: { xs: "none", md: "inline-flex" } }}
               >
                 About
@@ -283,7 +284,7 @@ const Landing = () => {
               />
             </Grid>
           </Grid>
-          <Grid container spacing={3} sx={{ mt: { xs: 4, md: 6 } }}>
+          <Grid id="features-section" container spacing={3} sx={{ mt: { xs: 4, md: 6 } }}>
             {highlights.map((item) => {
               const Icon = item.icon;
 

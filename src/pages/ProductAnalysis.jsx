@@ -20,10 +20,13 @@ import {
 } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
 import {
+  Area,
+  AreaChart,
   Bar,
   BarChart,
   CartesianGrid,
   Cell,
+  ComposedChart,
   Line,
   LineChart,
   ResponsiveContainer,
@@ -208,9 +211,23 @@ const ProductAnalysis = () => {
         });
       }
     });
-    return Array.from(map.values()).sort(
+
+    const sorted = Array.from(map.values()).sort(
       (left, right) => new Date(left.period).getTime() - new Date(right.period).getTime()
     );
+
+    let lastActualIndex = -1;
+    for (let i = 0; i < sorted.length; i++) {
+      if (sorted[i].actual !== null) {
+        lastActualIndex = i;
+      }
+    }
+
+    if (lastActualIndex !== -1 && lastActualIndex + 1 < sorted.length) {
+      sorted[lastActualIndex].forecast = sorted[lastActualIndex].actual;
+    }
+
+    return sorted;
   }, [data]);
 
   const clusterSeries = useMemo(
@@ -516,10 +533,20 @@ const ProductAnalysis = () => {
           >
             {demandSeries.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={demandSeries}>
-                  <CartesianGrid strokeDasharray="3 3" stroke={theme.palette.divider} />
-                  <XAxis dataKey="period" tick={{ fill: theme.palette.text.secondary }} />
-                  <YAxis tick={{ fill: theme.palette.text.secondary }} width={75} />
+                <ComposedChart data={demandSeries}>
+                  <defs>
+                    <linearGradient id="colorDemand" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor={theme.palette.primary.main} stopOpacity={0.3} />
+                      <stop offset="95%" stopColor={theme.palette.primary.main} stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke={theme.palette.divider} vertical={false} />
+                  <XAxis dataKey="period" tick={{ fill: theme.palette.text.secondary }} minTickGap={30} />
+                  <YAxis
+                    tick={{ fill: theme.palette.text.secondary }}
+                    tickFormatter={(val) => new Intl.NumberFormat("en-US", { notation: "compact", maximumFractionDigits: 1 }).format(val)}
+                    width={50}
+                  />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: theme.palette.background.paper,
@@ -529,21 +556,18 @@ const ProductAnalysis = () => {
                     }}
                     itemStyle={{ color: theme.palette.text.primary }}
                     formatter={(value, key) => {
-                      if (key === "total_sales" || key === "moving_average") {
-                        return [formatCurrency(value), key === "total_sales" ? "Total Sales" : "Moving Avg"];
-                      }
-                      if (key === "growth_rate_pct") {
-                        return [formatPercent(value, 2), "Growth %"];
-                      }
+                      if (key === "total_sales") return [formatCurrency(value), "Total Sales"];
+                      if (key === "moving_average") return [formatCurrency(value), "Average Sales"];
                       return [value, key];
                     }}
                   />
-                  <Line
+                  <Area
                     type="monotone"
                     dataKey="total_sales"
                     stroke={theme.palette.primary.main}
                     strokeWidth={2.8}
-                    dot={false}
+                    fillOpacity={1}
+                    fill="url(#colorDemand)"
                   />
                   <Line
                     type="monotone"
@@ -552,7 +576,7 @@ const ProductAnalysis = () => {
                     strokeWidth={2.2}
                     dot={false}
                   />
-                </LineChart>
+                </ComposedChart>
               </ResponsiveContainer>
             ) : (
               <Typography variant="body2" color="text.secondary">
@@ -570,10 +594,20 @@ const ProductAnalysis = () => {
           >
             {data?.salesForecast?.available && forecastSeries.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={forecastSeries}>
-                  <CartesianGrid strokeDasharray="3 3" stroke={theme.palette.divider} />
-                  <XAxis dataKey="period" tick={{ fill: theme.palette.text.secondary }} />
-                  <YAxis tick={{ fill: theme.palette.text.secondary }} width={75} />
+                <ComposedChart data={forecastSeries}>
+                  <defs>
+                    <linearGradient id="colorActual" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor={theme.palette.primary.main} stopOpacity={0.3} />
+                      <stop offset="95%" stopColor={theme.palette.primary.main} stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke={theme.palette.divider} vertical={false} />
+                  <XAxis dataKey="period" tick={{ fill: theme.palette.text.secondary }} minTickGap={30} />
+                  <YAxis
+                    tick={{ fill: theme.palette.text.secondary }}
+                    tickFormatter={(val) => new Intl.NumberFormat("en-US", { notation: "compact", maximumFractionDigits: 1 }).format(val)}
+                    width={50}
+                  />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: theme.palette.background.paper,
@@ -588,12 +622,13 @@ const ProductAnalysis = () => {
                         : [value, key]
                     }
                   />
-                  <Line
+                  <Area
                     type="monotone"
                     dataKey="actual"
                     stroke={theme.palette.primary.main}
                     strokeWidth={2.8}
-                    dot={false}
+                    fillOpacity={1}
+                    fill="url(#colorActual)"
                   />
                   <Line
                     type="monotone"
@@ -603,7 +638,7 @@ const ProductAnalysis = () => {
                     strokeDasharray="6 4"
                     dot={false}
                   />
-                </LineChart>
+                </ComposedChart>
               </ResponsiveContainer>
             ) : (
               <Typography variant="body2" color="text.secondary">

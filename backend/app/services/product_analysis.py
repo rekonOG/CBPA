@@ -657,8 +657,29 @@ def _extract_revenue_series(
 
 def _extract_event_datetime(frame: pd.DataFrame, detected_columns: DetectedColumns) -> pd.Series:
     if detected_columns.date and detected_columns.date in frame.columns:
-        parsed = pd.to_datetime(frame[detected_columns.date], errors="coerce")
-        return parsed
+        series = frame[detected_columns.date]
+        
+        if pd.api.types.is_object_dtype(series) or pd.api.types.is_string_dtype(series):
+            clean = series.dropna().astype(str).str.strip()
+            if not clean.empty and clean.str.isnumeric().mean() > 0.8:
+                series = pd.to_numeric(series, errors="coerce")
+
+        if pd.api.types.is_numeric_dtype(series):
+            clean_series = series.dropna()
+            if not clean_series.empty:
+                max_val = clean_series.max()
+                min_val = clean_series.min()
+                if max_val > 1e11:
+                    return pd.to_datetime(series, unit="ms", errors="coerce")
+                elif max_val > 1e8:
+                    return pd.to_datetime(series, unit="s", errors="coerce")
+                elif max_val > 1e7 and max_val < 3e7:  # likely YYYYMMDD e.g. 20230101
+                    return pd.to_datetime(series, format="%Y%m%d", errors="coerce")
+                elif max_val < 1e5:
+                    if min_val >= 1900 and max_val <= 2100:  # literal years like 2020
+                        return pd.to_datetime(series, format="%Y", errors="coerce")
+                    return pd.to_datetime(series, unit="D", origin="1899-12-30", errors="coerce")
+        return pd.to_datetime(series, errors="coerce")
 
     if detected_columns.date_component_prefix:
         year_column = _column_from_normalized(frame.columns, f"{detected_columns.date_component_prefix}_year")
