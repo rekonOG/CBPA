@@ -46,6 +46,14 @@ def select_best_unsupervised_model(feature_frame: pd.DataFrame) -> UnsupervisedS
     if kmeans_labels is not None:
         candidates.append(("kmeans", kmeans_labels, None))
 
+    agglomerative_labels = _fit_agglomerative(matrix)
+    if agglomerative_labels is not None:
+        candidates.append(("agglomerative", agglomerative_labels, None))
+
+    dbscan_labels = _fit_dbscan(matrix)
+    if dbscan_labels is not None:
+        candidates.append(("dbscan", dbscan_labels, None))
+
     scored_candidates: list[dict[str, Any]] = []
     best_labels: np.ndarray | None = None
     best_algorithm = "fallback"
@@ -129,7 +137,7 @@ def _fit_kmeans(matrix: np.ndarray) -> np.ndarray | None:
 
 def _fit_agglomerative(matrix: np.ndarray) -> np.ndarray | None:
     cluster_count = min(4, len(matrix))
-    if cluster_count < 2:
+    if cluster_count < 2 or len(matrix) > 20000:
         return None
 
     try:
@@ -141,7 +149,7 @@ def _fit_agglomerative(matrix: np.ndarray) -> np.ndarray | None:
 
 def _fit_dbscan(matrix: np.ndarray) -> np.ndarray | None:
     try:
-        if len(matrix) < 3:
+        if len(matrix) < 3 or len(matrix) > 20000:
             return None
 
         estimator = DBSCAN(eps=0.7, min_samples=3)
@@ -159,6 +167,6 @@ def _safe_silhouette_score(matrix: np.ndarray, labels: np.ndarray) -> float:
         return 0.0
 
     try:
-        return float(silhouette_score(matrix, labels))
+        return float(silhouette_score(matrix, labels, sample_size=10000, random_state=42))
     except Exception:
         return 0.0

@@ -186,6 +186,11 @@ class InputPreprocessor:
             series = frame[column].astype("string").str.strip()
             series = series.replace({"": pd.NA, "nan": pd.NA, "None": pd.NA, "NaT": pd.NA})
             series = series.fillna("Unknown")
+            
+            # Skip high cardinality columns (like IDs) to prevent MemoryError (OOM)
+            if series.nunique() > 100:
+                continue
+                
             encoded_source[column] = series
 
         if encoded_source.empty:

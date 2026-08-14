@@ -106,7 +106,7 @@ def run_segmentation(
     best_silhouette_score = 0.0
 
     if artifacts.model is not None:
-        prediction_frames = [frame for frame in [engineered_feature_frame, feature_frame_for_model] if frame is not None]
+        prediction_frames = [frame for frame in [feature_frame_for_model, engineered_feature_frame] if frame is not None]
         prediction_error: Exception | None = None
 
         for prediction_frame in prediction_frames:
@@ -554,7 +554,7 @@ def _compute_silhouette_score(matrix: np.ndarray, clusters: pd.Series) -> float:
         return 0.0
 
     try:
-        score = float(silhouette_score(matrix, labels))
+        score = float(silhouette_score(matrix, labels, sample_size=10000, random_state=42))
     except Exception:
         return 0.0
 

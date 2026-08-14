@@ -574,7 +574,11 @@ def _find_column_by_hints(columns: list[str], hints: list[str]) -> str | None:
 
 
 def _find_datetime_column(frame: pd.DataFrame, columns: list[str]) -> str | None:
-    hinted = _find_column_by_hints(columns, DATE_HINTS)
+    non_component_columns = [
+        col for col in columns 
+        if not _normalize_name(col).endswith(("_year", "_month", "_day", "_weekday"))
+    ]
+    hinted = _find_column_by_hints(non_component_columns, DATE_HINTS)
     if hinted is not None:
         return hinted
 
